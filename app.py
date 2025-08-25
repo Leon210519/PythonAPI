@@ -201,32 +201,36 @@ def show_weather():
             url = (
                 f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric&lang={get_locale()}"
             )
-            response = requests.get(url)
-            if response.status_code == 200:
-                data = response.json()
-                if data.get('cod') == 200:
-                    timezone_offset = data.get('timezone', 0)
-                    local_time = datetime.utcfromtimestamp(
-                        int(time.time()) + timezone_offset
-                    )
+            try:
+                response = requests.get(url, timeout=5)
+                if response.status_code == 200:
+                    data = response.json()
+                    if data.get('cod') == 200:
+                        timezone_offset = data.get('timezone', 0)
+                        local_time = datetime.utcfromtimestamp(
+                            int(time.time()) + timezone_offset
+                        )
 
-                    weather_data = {
-                        'city': data['name'],
-                        'temp': data['main']['temp'],
-                        'description': data['weather'][0]['description'],
-                        'icon': data['weather'][0]['icon'],
-                        'sunrise': datetime.utcfromtimestamp(
-                            data['sys']['sunrise'] + timezone_offset
-                        ).strftime('%H:%M'),
-                        'sunset': datetime.utcfromtimestamp(
-                            data['sys']['sunset'] + timezone_offset
-                        ).strftime('%H:%M'),
-                        'local_time': local_time.strftime('%H:%M'),
-                        'weather_id': data['weather'][0]['id'],
-                    }
+                        weather_data = {
+                            'city': data['name'],
+                            'temp': data['main']['temp'],
+                            'description': data['weather'][0]['description'],
+                            'icon': data['weather'][0]['icon'],
+                            'sunrise': datetime.utcfromtimestamp(
+                                data['sys']['sunrise'] + timezone_offset
+                            ).strftime('%H:%M'),
+                            'sunset': datetime.utcfromtimestamp(
+                                data['sys']['sunset'] + timezone_offset
+                            ).strftime('%H:%M'),
+                            'local_time': local_time.strftime('%H:%M'),
+                            'weather_id': data['weather'][0]['id'],
+                        }
+                    else:
+                        error = _("City not found.")
                 else:
-                    error = _("City not found.")
-            else:
+                    error = _("Error fetching data.")
+            except requests.exceptions.RequestException:
+                app.logger.exception("Weather API request failed")
                 error = _("Error fetching data.")
         else:
             error = _("Please enter a city name.")
@@ -253,10 +257,11 @@ def show_news():
     )
 
     try:
-        response = requests.get(url)
+        response = requests.get(url, timeout=5)
         data = response.json()
         articles = data.get('articles', [])[:5]
-    except Exception:
+    except requests.exceptions.RequestException:
+        app.logger.exception("News API request failed")
         articles = []
         flash(_("Failed to load news."))
 
