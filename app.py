@@ -181,7 +181,7 @@ def show_currencies():
     if 'username' not in session:
         flash(_("Please login first."))
         return redirect(url_for('login'))
-    return render_template('currency.html')
+    return render_template('currency.html', currency_api_key=config.CURRENCY_API_KEY)
 
 
 @app.route('/weather', methods=['GET', 'POST'])
@@ -231,7 +231,9 @@ def show_weather():
         else:
             error = _("Please enter a city name.")
 
-    return render_template('weather.html', weather=weather_data, error=error)
+    return render_template(
+        'weather.html', weather=weather_data, error=error, weather_api_key=config.WEATHER_API_KEY
+    )
 
 
 @app.route('/news')
