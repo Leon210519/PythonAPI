@@ -6,7 +6,16 @@ configuration values are loaded from :mod:`config` or environment variables so
 that deployments can be customised without code changes.
 """
 
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import (
+    Flask,
+    render_template,
+    request,
+    redirect,
+    url_for,
+    session,
+    flash,
+    jsonify,
+)
 from flask_babel import Babel, _
 from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
@@ -259,6 +268,42 @@ def show_news():
         flash(_("Failed to load news."))
 
     return render_template('news.html', articles=articles)
+
+
+# ----------------------------------------------------------------------------
+# API endpoints used by the frontend. These proxy external services so API
+# keys remain on the server side and can be configured via environment
+# variables.
+
+
+@app.route('/api/weather')
+def api_weather():
+    """Return weather data for ``city`` using the OpenWeatherMap API."""
+    city = request.args.get('city', '').strip()
+    lang = request.args.get('lang', get_locale())
+    if not city:
+        return jsonify({'error': 'city parameter is required'}), 400
+
+    url = (
+        f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={config.WEATHER_API_KEY}&units=metric&lang={lang}"
+    )
+    try:
+        resp = requests.get(url, timeout=5)
+        return jsonify(resp.json()), resp.status_code
+    except requests.RequestException:
+        return jsonify({'error': 'external API request failed'}), 502
+
+
+@app.route('/api/currency')
+def api_currency():
+    """Return exchange rates for the given ``base`` currency."""
+    base = request.args.get('base', 'USD').upper()
+    url = f"{config.CURRENCY_API_BASE_URL}/{config.CURRENCY_API_KEY}/latest/{base}"
+    try:
+        resp = requests.get(url, timeout=5)
+        return jsonify(resp.json()), resp.status_code
+    except requests.RequestException:
+        return jsonify({'error': 'external API request failed'}), 502
 
 
 if __name__ == '__main__':

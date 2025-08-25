@@ -290,9 +290,6 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-  const apiKey = 'adc5a7aa933d9a8382bb47d5';
-  const baseURL = 'https://v6.exchangerate-api.com/v6/' + apiKey;
-
   const selectFrom = document.getElementById('currencyFrom');
   const selectTo = document.getElementById('currencyTo');
   const iconFrom = document.getElementById('iconFrom');
@@ -396,7 +393,7 @@
       fetchBtn.disabled = true;
       fetchBtn.textContent = '⏳ ' + translations.updating;
 
-      const response = await fetch(`${baseURL}/latest/${currentFrom}`);
+      const response = await fetch(`/api/currency?base=${currentFrom}`);
       const data = await response.json();
 
       if (data.result !== 'success') throw new Error();

@@ -87,8 +87,6 @@
 </div>
 
 <script>
-  const apiKey = "0beb33baf383caabcb53cca61f1a04b8";
-
   const weatherIcon = document.getElementById("weatherIcon");
   const tempEl = document.getElementById("temp");
   const descEl = document.getElementById("desc");
@@ -113,9 +111,7 @@
     errorEl.textContent = "";
     try {
       const lang = langSelect.value;
-      const response = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric&lang=${lang}`
-      );
+      const response = await fetch(`/api/weather?city=${encodeURIComponent(city)}&lang=${lang}`);
       const data = await response.json();
       if (data.cod !== 200) {
         errorEl.textContent = "{{ _('City not found') }}";

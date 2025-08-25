@@ -14,11 +14,11 @@ import os
 NEWS_API_KEY = os.getenv("NEWS_API_KEY", "72ffaa246beb41a1af6d772997996e32")
 WEATHER_API_KEY = os.getenv("WEATHER_API_KEY", "0beb33baf383caabcb53cca61f1a04b8")
 
-# Base URL for the currency exchange API. The URL already contains the API key.
-# Override ``CURRENCY_API_URL`` in the environment to use a different service or
-# key.
-CURRENCY_API_URL = os.getenv(
-    "CURRENCY_API_URL",
-    "https://v6.exchangerate-api.com/v6/adc5a7aa933d9a8382bb47d5/latest/USD",
+# Settings for the currency exchange API.
+# ``CURRENCY_API_KEY`` and ``CURRENCY_API_BASE_URL`` are kept separate so the
+# base currency can be chosen dynamically when querying the backend route.
+CURRENCY_API_KEY = os.getenv("CURRENCY_API_KEY", "adc5a7aa933d9a8382bb47d5")
+CURRENCY_API_BASE_URL = os.getenv(
+    "CURRENCY_API_BASE_URL", "https://v6.exchangerate-api.com/v6"
 )
 
