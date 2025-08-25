@@ -8,7 +8,8 @@ that deployments can be customised without code changes.
 
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_babel import Babel, _
-import hashlib
+from werkzeug.security import generate_password_hash, check_password_hash
+import sqlite3
 import os
 import requests
 import config
@@ -64,39 +65,45 @@ def check_lang():
 
 
 # 🔐 User management ---------------------------------------------------------------
-# The location of the user data file can be overridden via ``USERS_FILE``.
-USERS_FILE = os.getenv("USERS_FILE", "userdaten.txt")
+USERS_DB = os.getenv("USERS_DB", "users.db")
 
 
-def hash_password(password: str) -> str:
-    """Return a SHA256 hash for ``password``."""
-    return hashlib.sha256(password.encode()).hexdigest()
+def init_db() -> None:
+    """Ensure the user database exists."""
+    conn = sqlite3.connect(USERS_DB)
+    conn.execute(
+        """CREATE TABLE IF NOT EXISTS users (
+                username TEXT PRIMARY KEY,
+                password_hash TEXT NOT NULL
+            )"""
+    )
+    conn.commit()
+    conn.close()
+
+
+init_db()
 
 
 def load_users() -> dict:
-    """Load the user database from ``USERS_FILE``.
-
-    The file stores ``username,hash`` pairs separated by commas.
-    """
-    if not os.path.exists(USERS_FILE):
-        return {}
-    users = {}
-    with open(USERS_FILE, 'r') as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-            parts = line.split(',')
-            if len(parts) >= 2:
-                username, hashed = parts[0], parts[1]
-                users[username] = hashed
-    return users
+    """Return all users from the database as a ``username: hash`` mapping."""
+    conn = sqlite3.connect(USERS_DB)
+    cursor = conn.cursor()
+    cursor.execute("SELECT username, password_hash FROM users")
+    rows = cursor.fetchall()
+    conn.close()
+    return {username: pw_hash for username, pw_hash in rows}
 
 
 def save_user(username: str, password: str) -> None:
-    """Append a new ``username``/``password`` pair to ``USERS_FILE``."""
-    with open(USERS_FILE, 'a') as f:
-        f.write(f"{username},{hash_password(password)}\n")
+    """Insert a new user into the database."""
+    conn = sqlite3.connect(USERS_DB)
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO users (username, password_hash) VALUES (?, ?)",
+        (username, generate_password_hash(password)),
+    )
+    conn.commit()
+    conn.close()
 
 
 @app.route('/')
@@ -139,8 +146,8 @@ def login():
             error = _("All fields are required.")
         else:
             users = load_users()
-            hashed = hash_password(password)
-            if users.get(username) == hashed:
+            hashed = users.get(username)
+            if hashed and check_password_hash(hashed, password):
                 session.permanent = True
                 session['username'] = username
                 flash(_("Logged in successfully."))
