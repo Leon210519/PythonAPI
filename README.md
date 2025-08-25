@@ -1,13 +1,10 @@
 # PythonAPI
 
-Simple Flask dashboard that shows weather, news and currency data.
 
-## Required environment variables
+Simple Flask-based API demonstration.
 
-Set the following variables before starting the application:
+## Environment Variables
 
-- `NEWS_API_KEY` – API key for [NewsAPI](https://newsapi.org/).
-- `WEATHER_API_KEY` – API key for [OpenWeatherMap](https://openweathermap.org/).
-- `CURRENCY_API_KEY` – API key for [ExchangeRate API](https://www.exchangerate-api.com/).
+- `FLASK_DEBUG`: Set to `1` to enable Flask debug mode. Use this only in development environments; omit or set to `0` in production.
 
-Optional variables such as `SECRET_KEY`, `SESSION_LIFETIME_MINUTES` or `USERS_DB` can also be used to further configure the application.
+Other configuration values are loaded from environment variables in `config.py`.

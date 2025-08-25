@@ -269,4 +269,6 @@ def show_news():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Enable debug mode only when FLASK_DEBUG is set to "1".
+    # This should be used for development environments only.
+    app.run(debug=os.getenv('FLASK_DEBUG') == '1')
