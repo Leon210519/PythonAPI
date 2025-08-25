@@ -1,3 +1,11 @@
+"""Flask application providing a simple multilingual dashboard.
+
+The app demonstrates user authentication, language switching via Flask-Babel and
+integration with a few public APIs (weather, news and currency exchange). All
+configuration values are loaded from :mod:`config` or environment variables so
+that deployments can be customised without code changes.
+"""
+
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_babel import Babel, _
 import hashlib
@@ -8,10 +16,15 @@ import time
 from datetime import datetime, timedelta
 
 app = Flask(__name__)
-app.secret_key = "change_this_in_production"
-app.permanent_session_lifetime = timedelta(minutes=30)
 
-# 🌐 Spracheinstellungen
+# Secret key and session lifetime are configurable through environment
+# variables to ease deployment in different environments.
+app.secret_key = os.getenv("SECRET_KEY", "change_this_in_production")
+app.permanent_session_lifetime = timedelta(
+    minutes=int(os.getenv("SESSION_LIFETIME_MINUTES", 30))
+)
+
+# 🌐 Language configuration --------------------------------------------------------
 app.config['LANGUAGES'] = {
     'en': 'English',
     'de': 'Deutsch'
@@ -19,37 +32,52 @@ app.config['LANGUAGES'] = {
 app.config['BABEL_DEFAULT_LOCALE'] = 'en'
 app.config['BABEL_TRANSLATION_DIRECTORIES'] = 'translations'
 
-# Lokalisierung festlegen
+
 def get_locale():
+    """Return the currently active language code."""
     return session.get('lang', 'en')
 
-# Richtiges Initialisieren von Babel (wichtig!)
+
+# Initialise Babel with the locale selector.
 babel = Babel(app, locale_selector=get_locale)
+
 
 @app.context_processor
 def inject_get_locale():
+    """Make ``get_locale`` available inside templates."""
     return dict(get_locale=get_locale)
 
-# Sprache ändern
+
 @app.route('/set_language/<lang_code>')
 def set_language(lang_code):
+    """Persist the selected ``lang_code`` in the session."""
     if lang_code in app.config['LANGUAGES']:
         session.permanent = True
         session['lang'] = lang_code
     return redirect(request.referrer or url_for('dashboard'))
 
-# ✅ Route
+
 @app.route('/check_lang')
 def check_lang():
+    """Simple diagnostics route showing the current language."""
     return f"Current language: {get_locale()}"
 
-# 🔐 Nutzerverwaltung
-USERS_FILE = "userdaten.txt"
 
-def hash_password(password):
+# 🔐 User management ---------------------------------------------------------------
+# The location of the user data file can be overridden via ``USERS_FILE``.
+USERS_FILE = os.getenv("USERS_FILE", "userdaten.txt")
+
+
+def hash_password(password: str) -> str:
+    """Return a SHA256 hash for ``password``."""
     return hashlib.sha256(password.encode()).hexdigest()
 
-def load_users():
+
+def load_users() -> dict:
+    """Load the user database from ``USERS_FILE``.
+
+    The file stores ``username,hash`` pairs separated by commas.
+    """
     if not os.path.exists(USERS_FILE):
         return {}
     users = {}
@@ -64,16 +92,22 @@ def load_users():
                 users[username] = hashed
     return users
 
-def save_user(username, password):
+
+def save_user(username: str, password: str) -> None:
+    """Append a new ``username``/``password`` pair to ``USERS_FILE``."""
     with open(USERS_FILE, 'a') as f:
         f.write(f"{username},{hash_password(password)}\n")
 
+
 @app.route('/')
 def home():
+    """Redirect to the login page."""
     return redirect(url_for('login'))
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    """Handle user registration."""
     error = ""
     if request.method == 'POST':
         username = request.form['username'].strip()
@@ -92,8 +126,10 @@ def register():
 
     return render_template('register.html', error=error)
 
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    """Authenticate the user and start a session."""
     error = ""
     if request.method == 'POST':
         username = request.form['username'].strip()
@@ -114,28 +150,36 @@ def login():
 
     return render_template('login.html', error=error)
 
+
 @app.route('/logout')
 def logout():
+    """Log the current user out and clear the session."""
     session.clear()
     flash(_("You have been logged out."))
     return redirect(url_for('login'))
 
+
 @app.route('/dashboard')
 def dashboard():
+    """Display the main dashboard if the user is logged in."""
     if 'username' not in session:
         flash(_("Please login first."))
         return redirect(url_for('login'))
     return render_template('dashboard.html', username=session['username'])
 
+
 @app.route('/currency')
 def show_currencies():
+    """Render the currency conversion tool."""
     if 'username' not in session:
         flash(_("Please login first."))
         return redirect(url_for('login'))
     return render_template('currency.html')
 
+
 @app.route('/weather', methods=['GET', 'POST'])
 def show_weather():
+    """Display weather information for a requested city."""
     if 'username' not in session:
         flash(_("Please login first."))
         return redirect(url_for('login'))
@@ -147,21 +191,29 @@ def show_weather():
         city = request.form.get('city', '').strip()
         if city:
             api_key = config.WEATHER_API_KEY
-            url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric&lang={get_locale()}"
+            url = (
+                f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric&lang={get_locale()}"
+            )
             response = requests.get(url)
             if response.status_code == 200:
                 data = response.json()
                 if data.get('cod') == 200:
                     timezone_offset = data.get('timezone', 0)
-                    local_time = datetime.utcfromtimestamp(int(time.time()) + timezone_offset)
+                    local_time = datetime.utcfromtimestamp(
+                        int(time.time()) + timezone_offset
+                    )
 
                     weather_data = {
                         'city': data['name'],
                         'temp': data['main']['temp'],
                         'description': data['weather'][0]['description'],
                         'icon': data['weather'][0]['icon'],
-                        'sunrise': datetime.utcfromtimestamp(data['sys']['sunrise'] + timezone_offset).strftime('%H:%M'),
-                        'sunset': datetime.utcfromtimestamp(data['sys']['sunset'] + timezone_offset).strftime('%H:%M'),
+                        'sunrise': datetime.utcfromtimestamp(
+                            data['sys']['sunrise'] + timezone_offset
+                        ).strftime('%H:%M'),
+                        'sunset': datetime.utcfromtimestamp(
+                            data['sys']['sunset'] + timezone_offset
+                        ).strftime('%H:%M'),
                         'local_time': local_time.strftime('%H:%M'),
                         'weather_id': data['weather'][0]['id'],
                     }
@@ -174,26 +226,33 @@ def show_weather():
 
     return render_template('weather.html', weather=weather_data, error=error)
 
+
 @app.route('/news')
 def show_news():
+    """Fetch and display the latest news headlines."""
     if 'username' not in session:
         flash(_("Please login first."))
         return redirect(url_for('login'))
 
     lang = get_locale()
-    country = 'eg' if lang == 'ar' else 'us'
+    # Map language codes to the NewsAPI country parameter.
+    country_map = {'en': 'us', 'de': 'de'}
+    country = country_map.get(lang, 'us')
 
-    url = f"https://newsapi.org/v2/top-headlines?country={country}&apiKey={config.NEWS_API_KEY}&language={lang}"
+    url = (
+        f"https://newsapi.org/v2/top-headlines?country={country}&apiKey={config.NEWS_API_KEY}&language={lang}"
+    )
 
     try:
         response = requests.get(url)
         data = response.json()
         articles = data.get('articles', [])[:5]
-    except Exception as e:
+    except Exception:
         articles = []
         flash(_("Failed to load news."))
 
     return render_template('news.html', articles=articles)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
