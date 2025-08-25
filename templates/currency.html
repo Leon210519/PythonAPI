@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="{{ get_locale() }}" dir="{% if get_locale() == 'ar' %}rtl{% else %}ltr{% endif %}">
+<head>
+  <meta charset="UTF-8" />
+  <title>CurrencyPro</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cairo&display=swap');
+
+    
+    body {
+      margin: 0; padding: 0;
+      font-family: 'Cairo', sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(270deg, #2193b0, #6dd5ed, #2193b0);
+      background-size: 600% 600%;
+      animation: gradientShift 20s ease infinite;
+      color: #222;
+      user-select: none;
+    }
+    @keyframes gradientShift {
+      0%{background-position:0% 50%}
+      50%{background-position:100% 50%}
+      100%{background-position:0% 50%}
+    }
+
+   
+    nav.navbar {
+      background: rgba(255 255 255 / 0.95);
+      box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+      border-radius: 0 0 18px 18px;
+      padding: 0.5rem 1rem;
+      font-weight: 700;
+      color: #0d6efd;
+      user-select: none;
+    }
+    nav.navbar .navbar-brand {
+      font-size: 1.8rem;
+      color: #0d6efd;
+      font-weight: 900;
+    }
+    nav.navbar .nav-link {
+      color: #0d6efd;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+    nav.navbar .nav-link:hover, nav.navbar .nav-link:focus {
+      color: #0647b8;
+      text-decoration: underline;
+    }
+    nav.navbar .btn-back {
+      border: none;
+      background: #0d6efd;
+      color: white;
+      font-size: 1.1rem;
+      padding: 6px 16px;
+      border-radius: 14px;
+      transition: background 0.3s ease;
+      cursor: pointer;
+    }
+    nav.navbar .btn-back:hover {
+      background: #0647b8;
+    }
+    
+    .app {
+      max-width: 1000px;
+      margin: 25px auto 70px auto;
+      padding: 30px 35px;
+      background: rgba(255 255 255 / 0.95);
+      border-radius: 20px;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.12);
+    }
+    
+    .card {
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      background: #fff;
+      user-select: none;
+    }
+    .card:hover, .card:focus-within {
+      transform: translateY(-12px) scale(1.02);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+      outline: none;
+    }
+    
+    .currency-icon {
+      font-size: 5rem;
+      display: inline-block;
+      animation: bounceRotate 1.5s ease-in-out infinite;
+      filter: drop-shadow(0 0 6px rgba(0, 110, 253, 0.8));
+      user-select: none;
+    }
+    @keyframes bounceRotate {
+      0%   { transform: translateY(0) rotate(0deg); }
+      50%  { transform: translateY(-20px) rotate(15deg); }
+      100% { transform: translateY(0) rotate(0deg); }
+    }
+    
+    .currency-name {
+      font-weight: 800;
+      font-size: 1.5rem;
+      margin-top: 12px;
+      color: #0d6efd;
+      min-height: 36px;
+      transition: color 0.3s ease;
+      letter-spacing: 0.8px;
+    }
+    
+    #rateValue {
+      font-size: 3.5rem;
+      font-weight: 900;
+      color: #0d6efd;
+      user-select: none;
+      letter-spacing: 1.8px;
+      margin-top: 10px;
+      text-shadow: 0 0 12px rgba(13, 110, 253, 0.5);
+    }
+    
+    .amount-input {
+      font-size: 1.4rem;
+      font-weight: 600;
+      padding: 8px 12px;
+      border-radius: 12px;
+      border: 2px solid #0d6efd;
+      max-width: 200px;
+      text-align: center;
+      margin: 10px auto 0 auto;
+      display: block;
+      transition: border-color 0.3s ease;
+      user-select: text;
+    }
+    .amount-input:focus {
+      outline: none;
+      border-color: #0647b8;
+      box-shadow: 0 0 8px rgba(6, 71, 184, 0.5);
+    }
+    
+    #swapBtn {
+      margin-top: 15px;
+      font-size: 2.8rem;
+      background: linear-gradient(45deg, #0d6efd, #3a8cff);
+      border: none;
+      color: white;
+      cursor: pointer;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 18px rgba(13,110,253,0.5);
+      transition: box-shadow 0.3s ease, transform 0.4s ease;
+      user-select: none;
+    }
+    #swapBtn:hover {
+      box-shadow: 0 10px 30px rgba(13,110,253,0.9);
+      transform: rotate(180deg) scale(1.1);
+    }
+    #swapBtn:active {
+      transform: scale(0.9) rotate(180deg);
+      box-shadow: 0 4px 12px rgba(13,110,253,0.9);
+    }
+    
+    #fetchRate {
+      font-size: 1.3rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, #0d6efd, #3a8cff);
+      border: none;
+      border-radius: 14px;
+      padding: 10px 24px;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 5px 18px rgba(13,110,253,0.6);
+      transition: background 0.3s ease;
+      user-select: none;
+    }
+    #fetchRate:hover {
+      background: linear-gradient(90deg, #0647b8, #1a6efb);
+    }
+    #fetchRate:active {
+      transform: scale(0.95);
+    }
+    
+    .label-container {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #0d6efd;
+      margin-bottom: 14px;
+      text-align: center;
+      user-select: none;
+    }
+    
+    canvas {
+      max-height: 360px !important;
+      border-radius: 14px;
+      box-shadow: 0 12px 35px rgba(13, 110, 253, 0.4);
+      background: #f9faff;
+      transition: all 0.6s ease;
+      user-select: none;
+    }
+    
+    footer {
+      text-align: center;
+      font-size: 1rem;
+      margin-top: 75px;
+      color: #555;
+      user-select: none;
+    }
+    
+    select:focus, button:focus {
+      outline: 3px solid #0d6efd;
+      outline-offset: 3px;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar d-flex align-items-center justify-content-between" role="navigation">
+  <button class="btn-back" id="backBtn">{{ _('Back') }}</button>
+  <div class="navbar-brand">CurrencyPro</div>
+  <div class="d-flex gap-3">
+    <a href="#" class="nav-link" id="navConvert">{{ _('Convert') }}</a>
+    <a href="#" class="nav-link" id="navCompare">{{ _('Compare') }}</a>
+    <a href="#" class="nav-link" id="navToday">{{ _('Today') }}</a>
+    <div class="dropdown">
+      <button class="nav-link dropdown-toggle" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+        🌐 {{ _('Language') }}
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="languageDropdown">
+        <li><a class="dropdown-item" href="{{ url_for('set_language', lang_code='en') }}">English</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('set_language', lang_code='de') }}">Deutsch</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="app">
+  <h2 class="text-center mb-3">💱 {{ _('Currency Comparison and Conversion') }}</h2>
+  <p class="text-center text-muted mb-4">{{ _('Choose two currencies, enter an amount, and see the result, current rate, and 7-day chart') }}</p>
+
+  <div class="row g-4 mb-3 align-items-center justify-content-center">
+
+    <div class="col-md-4">
+      <div class="card p-4 text-center">
+        <div class="currency-icon" id="iconFrom">💵</div>
+        <div class="currency-name" id="nameFrom">{{ _('Base Currency') }}</div>
+        <select class="form-select mt-3" id="currencyFrom"></select>
+        <input type="number" placeholder="{{ _('Enter amount') }}" class="amount-input" id="amountInput" />
+      </div>
+    </div>
+
+    <div class="col-md-1 d-flex justify-content-center">
+      <button id="swapBtn" title="{{ _('Swap currencies') }}">⇄</button>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card p-4 text-center">
+        <div class="currency-icon" id="iconTo">💶</div>
+        <div class="currency-name" id="nameTo">{{ _('Target Currency') }}</div>
+        <select class="form-select mt-3" id="currencyTo"></select>
+        <div class="mt-3" id="convertedAmount">--</div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card p-3 text-center">
+        <h5>{{ _('Current Rate') }}</h5>
+        <div id="rateValue">--</div>
+        <button class="btn btn-primary mt-3" id="fetchRate">🔄 {{ _('Update Data') }}</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-5">
+    <h5 class="label-container" id="labelChart">📊 {{ _('Exchange rate chart') }}</h5>
+    <canvas id="myChart"></canvas>
+  </div>
+
+  <footer>
+    ⓒ 2025 - Currency <a href="https://www.exchangerate-api.com/" target="_blank" rel="noopener noreferrer">ExchangeRate API</a>
+  </footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  const apiKey = 'adc5a7aa933d9a8382bb47d5';
+  const baseURL = 'https://v6.exchangerate-api.com/v6/' + apiKey;
+
+  const selectFrom = document.getElementById('currencyFrom');
+  const selectTo = document.getElementById('currencyTo');
+  const iconFrom = document.getElementById('iconFrom');
+  const iconTo = document.getElementById('iconTo');
+  const nameFrom = document.getElementById('nameFrom');
+  const nameTo = document.getElementById('nameTo');
+  const fetchBtn = document.getElementById('fetchRate');
+  const rateValue = document.getElementById('rateValue');
+  const labelChart = document.getElementById('labelChart');
+  const ctx = document.getElementById('myChart').getContext('2d');
+  const amountInput = document.getElementById('amountInput');
+  const convertedAmount = document.getElementById('convertedAmount');
+  const swapBtn = document.getElementById('swapBtn');
+  const backBtn = document.getElementById('backBtn');
+
+  const translations = {
+    updating: "{{ _('Updating...') }}",
+    update_data: "{{ _('Update Data') }}",
+    chart_label: "{{ _('Chart of {from_currency} to {to_currency} over 7 days') }}",
+    labels: [
+      "{{ _('Previous 6 days') }}",
+      "{{ _('Previous 5 days') }}",
+      "{{ _('Previous 4 days') }}",
+      "{{ _('Previous 3 days') }}",
+      "{{ _('Previous 2 days') }}",
+      "{{ _('Yesterday') }}",
+      "{{ _('Today') }}"
+    ],
+    dataset_label: "{{ _('{from_currency} to {to_currency} price') }}",
+    fetch_error: "{{ _('Error fetching data. Please try again later.') }}"
+  };
+
+  const currencyDict = {
+    "USD": {emoji: "💵", name: "US-Dollar"},
+    "EUR": {emoji: "💶", name: "Euro"},
+    "JPY": {emoji: "💴", name: "Japanese Yen"},
+    "GBP": {emoji: "💷", name: "British Pound"},
+    "AUD": {emoji: "🇦🇺", name: "Australian Dollar"},
+    "CAD": {emoji: "🇨🇦", name: "Canadian Dollar"},
+    "CHF": {emoji: "🇨🇭", name: "Swiss Franc"},
+    "CNY": {emoji: "🇨🇳", name: "Chinese Yuan"},
+    "SEK": {emoji: "🇸🇪", name: "Swedish Krona"},
+    "NZD": {emoji: "🇳🇿", name: "New Zealand Dollar"},
+    "SAR": {emoji: "🕌", name: "Saudi Riyal"},
+    "AED": {emoji: "🏙️", name: "UAE Dirham"},
+    "EGP": {emoji: "🦅", name: "Egyptian Pound"},
+    "TRY": {emoji: "🇹🇷", name: "Turkish Lira"},
+    "INR": {emoji: "🇮🇳", name: "Indian Rupee"},
+    "KRW": {emoji: "🇰🇷", name: "South Korean Won"},
+    "BRL": {emoji: "🇧🇷", name: "Brazilian Real"},
+    "ZAR": {emoji: "🇿🇦", name: "South African Rand"},
+    "MXN": {emoji: "🇲🇽", name: "Mexican Peso"}
+  };
+
+  let rates = {};
+  let chart = null;
+  let currentFrom = 'USD';
+  let currentTo = 'EUR';
+
+  function populateSelects() {
+    Object.keys(currencyDict).forEach(code => {
+      const optionFrom = document.createElement('option');
+      optionFrom.value = code;
+      optionFrom.textContent = `${code} - ${currencyDict[code].name}`;
+      selectFrom.appendChild(optionFrom);
+
+      const optionTo = document.createElement('option');
+      optionTo.value = code;
+      optionTo.textContent = `${code} - ${currencyDict[code].name}`;
+      selectTo.appendChild(optionTo);
+    });
+    selectFrom.value = currentFrom;
+    selectTo.value = currentTo;
+  }
+
+  function updateCurrencyInfo() {
+    const from = selectFrom.value;
+    const to = selectTo.value;
+    iconFrom.textContent = currencyDict[from]?.emoji || '❓';
+    iconTo.textContent = currencyDict[to]?.emoji || '❓';
+    nameFrom.textContent = currencyDict[from]?.name || from;
+    nameTo.textContent = currencyDict[to]?.name || to;
+  }
+
+  function calculateConversion() {
+    if (!rates || !rates[currentTo]) {
+      convertedAmount.textContent = '--';
+      return;
+    }
+    const amount = parseFloat(amountInput.value);
+    if (isNaN(amount) || amount <= 0) {
+      convertedAmount.textContent = '--';
+      return;
+    }
+    const converted = amount * rates[currentTo];
+    convertedAmount.textContent = `${converted.toFixed(4)} ${currentTo}`;
+  }
+
+  async function fetchRates() {
+    try {
+      fetchBtn.disabled = true;
+      fetchBtn.textContent = '⏳ ' + translations.updating;
+
+      const response = await fetch(`${baseURL}/latest/${currentFrom}`);
+      const data = await response.json();
+
+      if (data.result !== 'success') throw new Error();
+
+      rates = data.conversion_rates;
+      rateValue.textContent = rates[currentTo] ? rates[currentTo].toFixed(5) : '--';
+      labelChart.textContent = `📊 ${translations.chart_label.replace('{from_currency}', currentFrom).replace('{to_currency}', currentTo)}`;
+      calculateConversion();
+      await fetchChartData();
+    } catch (err) {
+      alert(translations.fetch_error);
+      console.error(err);
+    } finally {
+      fetchBtn.disabled = false;
+      fetchBtn.textContent = '🔄 ' + translations.update_data;
+    }
+  }
+
+  async function fetchChartData() {
+    const prices = [];
+    for (let i = 0; i < 7; i++) {
+      let basePrice = rates[currentTo] || 1;
+      let fluctuation = Math.random() * 0.04 - 0.02;
+      prices.push((basePrice * (1 + fluctuation)).toFixed(5));
+    }
+    const labels = translations.labels;
+
+    if (chart) chart.destroy();
+
+    chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: translations.dataset_label.replace('{from_currency}', currentFrom).replace('{to_currency}', currentTo),
+          data: prices,
+          fill: true,
+          borderColor: '#0d6efd',
+          backgroundColor: 'rgba(13, 110, 253, 0.2)',
+          tension: 0.3,
+          pointRadius: 6,
+          pointBackgroundColor: '#0d6efd',
+          pointHoverRadius: 8,
+          borderWidth: 3,
+          cubicInterpolationMode: 'monotone',
+        }]
+      },
+      options: {
+        responsive: true,
+        animation: { duration: 1000, easing: 'easeInOutQuad' },
+        scales: {
+          y: {
+            beginAtZero: false,
+            ticks: { color: '#0d6efd', font: { size: 14 } },
+            grid: { color: '#e0e7ff' }
+          },
+          x: {
+            ticks: { color: '#0d6efd', font: { size: 14 } },
+            grid: { color: '#e0e7ff' }
+          }
+        },
+        plugins: {
+          legend: { display: true, labels: { color: '#0d6efd', font: { size: 14 } } },
+          tooltip: {
+            enabled: true,
+            backgroundColor: '#0d6efd',
+            titleColor: '#fff',
+            bodyColor: '#fff',
+            cornerRadius: 6
+          }
+        }
+      }
+    });
+  }
+
+  function swapCurrencies() {
+    [currentFrom, currentTo] = [currentTo, currentFrom];
+    selectFrom.value = currentFrom;
+    selectTo.value = currentTo;
+    updateCurrencyInfo();
+    fetchRates();
+  }
+
+  backBtn.onclick = () => window.history.back();
+  selectFrom.addEventListener('change', () => { currentFrom = selectFrom.value; updateCurrencyInfo(); fetchRates(); });
+  selectTo.addEventListener('change', () => { currentTo = selectTo.value; updateCurrencyInfo(); fetchRates(); });
+  amountInput.addEventListener('input', calculateConversion);
+  swapBtn.addEventListener('click', swapCurrencies);
+  fetchBtn.addEventListener('click', fetchRates);
+
+  populateSelects();
+  updateCurrencyInfo();
+  fetchRates();
+</script>
+
+</body>
+</html>

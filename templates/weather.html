@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="{{ get_locale() }}">
+<head>
+  <meta charset="UTF-8" />
+  <title>{{ _("Weather") }}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    body.light-mode {
+      background-color: #f8f9fa;
+      color: #000;
+    }
+
+    body.dark-mode {
+      background-color: #121212;
+      color: #fff;
+    }
+
+    .card-custom {
+      border-radius: 12px;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    body.dark-mode .card-custom {
+      background-color: #1e1e1e;
+      color: #fff;
+      box-shadow: 0 6px 16px rgba(255, 255, 255, 0.05);
+    }
+
+    .card-custom:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .weather-icon {
+      font-size: 6rem;
+      margin-bottom: 20px;
+    }
+
+    .btn-back {
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body class="light-mode">
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary px-4">
+  <a class="navbar-brand" href="{{ url_for('dashboard') }}">{{ _("Enzyklopädie 🌐") }}</a>
+
+  <!-- Language Selector -->
+  <div class="lang-select ms-auto">
+    <select class="form-select" id="languageSelector" onchange="changeLanguage()">
+      <option value="en" {% if get_locale() == 'en' %}selected{% endif %}>English</option>
+      <option value="de" {% if get_locale() == 'de' %}selected{% endif %}>Deutsch</option>
+    </select>
+  </div>
+
+  <!-- Dark mode toggle -->
+  <button class="btn btn-outline-light ms-3" onclick="toggleDarkMode()">🌓</button>
+</nav>
+
+<div class="container mt-4">
+  <button class="btn btn-secondary btn-back" onclick="goBack()">{{ _("Back to Dashboard") }}</button>
+
+  <div class="card card-custom p-4 text-center">
+    <div id="weatherIcon" class="weather-icon">☀️</div>
+    <h2 id="temp" class="mb-3">--°C</h2>
+    <p id="desc" class="mb-1">---</p>
+    <p>{{ _("Humidity") }}: <span id="humidity">--</span>%</p>
+    <p>{{ _("Wind") }}: <span id="wind">--</span> {{ _("km/h") }}</p>
+
+    <form id="weatherForm" class="mt-4">
+      <input
+        type="text"
+        id="cityInput"
+        class="form-control"
+        placeholder="{{ _('Enter city name') }}"
+        required
+      />
+      <button type="submit" class="btn btn-primary mt-3">{{ _('Show Weather') }}</button>
+    </form>
+
+    <div id="error" class="text-danger mt-3"></div>
+  </div>
+</div>
+
+<script>
+  const apiKey = "0beb33baf383caabcb53cca61f1a04b8";
+
+  const weatherIcon = document.getElementById("weatherIcon");
+  const tempEl = document.getElementById("temp");
+  const descEl = document.getElementById("desc");
+  const humidityEl = document.getElementById("humidity");
+  const windEl = document.getElementById("wind");
+  const errorEl = document.getElementById("error");
+  const cityInput = document.getElementById("cityInput");
+  const weatherForm = document.getElementById("weatherForm");
+  const langSelect = document.getElementById("languageSelector");
+
+  function updateIcon(id) {
+    if (id === 800) weatherIcon.textContent = "☀️";
+    else if (id >= 801 && id <= 804) weatherIcon.textContent = "☁️";
+    else if (id >= 500 && id <= 531) weatherIcon.textContent = "🌧️";
+    else if (id >= 200 && id <= 232) weatherIcon.textContent = "⛈️";
+    else if (id >= 600 && id <= 622) weatherIcon.textContent = "❄️";
+    else if (id >= 701 && id <= 781) weatherIcon.textContent = "🌫️";
+    else weatherIcon.textContent = "❓";
+  }
+
+  async function getWeather(city) {
+    errorEl.textContent = "";
+    try {
+      const lang = langSelect.value;
+      const response = await fetch(
+        `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric&lang=${lang}`
+      );
+      const data = await response.json();
+      if (data.cod !== 200) {
+        errorEl.textContent = "{{ _('City not found') }}";
+        return;
+      }
+
+      updateIcon(data.weather[0].id);
+      tempEl.textContent = `${Math.round(data.main.temp)}°C`;
+      descEl.textContent = data.weather[0].description;
+      humidityEl.textContent = data.main.humidity;
+      windEl.textContent = data.wind.speed;
+    } catch (err) {
+      errorEl.textContent = "{{ _('An error occurred, please try again') }}";
+    }
+  }
+
+  weatherForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const city = cityInput.value.trim();
+    if (city) {
+      getWeather(city);
+    }
+  });
+
+  // Dark mode toggle
+  function toggleDarkMode() {
+    const body = document.body;
+    if (body.classList.contains("dark-mode")) {
+      body.classList.remove("dark-mode");
+      body.classList.add("light-mode");
+      localStorage.setItem("theme", "light-mode");
+    } else {
+      body.classList.remove("light-mode");
+      body.classList.add("dark-mode");
+      localStorage.setItem("theme", "dark-mode");
+    }
+  }
+
+  // localStorage
+  window.onload = () => {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme) {
+      document.body.className = savedTheme;
+    }
+
+    const savedLang = "{{ get_locale() }}";
+    document.getElementById("languageSelector").value = savedLang;
+  };
+
+  function changeLanguage() {
+    const selectedLang = langSelect.value;
+    window.location.href = '/set_language/' + selectedLang;
+  }
+
+  function goBack() {
+    window.location.href = "{{ url_for('dashboard') }}";
+  }
+</script>
+
+</body>
+</html>

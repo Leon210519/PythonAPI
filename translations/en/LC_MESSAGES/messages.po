@@ -1,0 +1,160 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: en\n"
+
+msgid "Enzyklopädie 🌐 - Dashboard"
+msgstr "Encyclopedia 🌐 - Dashboard"
+
+msgid "Enzyklopädie 🌐"
+msgstr "Encyclopedia 🌐"
+
+msgid "Search..."
+msgstr "Search..."
+
+msgid "Search"
+msgstr "Search"
+
+msgid "Logout"
+msgstr "Logout"
+
+msgid "Toggle dark mode"
+msgstr "Toggle dark mode"
+
+msgid "Welcome"
+msgstr "Welcome"
+
+msgid "Number of visits:"
+msgstr "Number of visits:"
+
+msgid "Currency"
+msgstr "Currency"
+
+msgid "Check the latest exchange rates from global currencies."
+msgstr "Check the latest exchange rates from global currencies."
+
+msgid "Go"
+msgstr "Go"
+
+msgid "Weather"
+msgstr "Weather"
+
+msgid "Check weather forecast for any city worldwide."
+msgstr "Check weather forecast for any city worldwide."
+
+msgid "News"
+msgstr "News"
+
+msgid "Get the latest news headlines updated live."
+msgstr "Get the latest news headlines updated live."
+
+msgid "Select language"
+msgstr "Select language"
+
+msgid "Login - Enzyklopädie"
+msgstr "Login - Encyclopedia"
+
+msgid "Login to"
+msgstr "Login to"
+
+msgid "Enzyklopädie"
+msgstr "Encyclopedia"
+
+msgid "Username"
+msgstr "Username"
+
+msgid "Password"
+msgstr "Password"
+
+msgid "Login"
+msgstr "Login"
+
+msgid "Register"
+msgstr "Register"
+
+msgid "Register - Mawsoa"
+msgstr "Register - Mawsoa"
+
+msgid "Register at"
+msgstr "Register at"
+
+msgid "Mawsoa"
+msgstr "Mawsoa"
+
+msgid "Username"
+msgstr "Username"
+
+msgid "Password"
+msgstr "Password"
+
+msgid "Register"
+msgstr "Register"
+
+msgid "Back to Login"
+msgstr "Back to Login"
+
+msgid "Weather"
+msgstr "Weather"
+
+msgid "Enzyklopädie 🌐"
+msgstr "Encyclopedia 🌐"
+
+msgid "Back to Dashboard"
+msgstr "Back to Dashboard"
+
+msgid "Humidity"
+msgstr "Humidity"
+
+msgid "Wind"
+msgstr "Wind"
+
+msgid "km/h"
+msgstr "km/h"
+
+msgid "Enter city name"
+msgstr "Enter city name"
+
+msgid "Show Weather"
+msgstr "Show Weather"
+
+msgid "City not found"
+msgstr "City not found"
+
+msgid "An error occurred, please try again"
+msgstr "An error occurred, please try again"
+
+msgid "Updating..."
+msgstr "Updating..."
+
+msgid "Update Data"
+msgstr "Update Data"
+
+msgid "Chart of {from_currency} to {to_currency} over 7 days"
+msgstr "Chart of {from_currency} to {to_currency} over 7 days"
+
+msgid "Previous 6 days"
+msgstr "Previous 6 days"
+
+msgid "Previous 5 days"
+msgstr "Previous 5 days"
+
+msgid "Previous 4 days"
+msgstr "Previous 4 days"
+
+msgid "Previous 3 days"
+msgstr "Previous 3 days"
+
+msgid "Previous 2 days"
+msgstr "Previous 2 days"
+
+msgid "Yesterday"
+msgstr "Yesterday"
+
+msgid "Today"
+msgstr "Today"
+
+msgid "{from_currency} to {to_currency} price"
+msgstr "{from_currency} to {to_currency} price"
+
+msgid "Error fetching data. Please try again later."
+msgstr "Error fetching data. Please try again later."

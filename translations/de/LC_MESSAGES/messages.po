@@ -1,0 +1,160 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: de\n"
+
+msgid "Enzyklopädie 🌐 - Dashboard"
+msgstr "Enzyklopädie 🌐 - Übersicht"
+
+msgid "Enzyklopädie 🌐"
+msgstr "Enzyklopädie 🌐"
+
+msgid "Search..."
+msgstr "Suchen..."
+
+msgid "Search"
+msgstr "Suchen"
+
+msgid "Logout"
+msgstr "Abmelden"
+
+msgid "Toggle dark mode"
+msgstr "Dunkelmodus umschalten"
+
+msgid "Welcome"
+msgstr "Willkommen"
+
+msgid "Number of visits:"
+msgstr "Anzahl der Besuche:"
+
+msgid "Currency"
+msgstr "Währung"
+
+msgid "Check the latest exchange rates from global currencies."
+msgstr "Prüfen Sie die aktuellen Wechselkurse globaler Währungen."
+
+msgid "Go"
+msgstr "Los"
+
+msgid "Weather"
+msgstr "Wetter"
+
+msgid "Check weather forecast for any city worldwide."
+msgstr "Wettervorhersage für jede Stadt weltweit prüfen."
+
+msgid "News"
+msgstr "Nachrichten"
+
+msgid "Get the latest news headlines updated live."
+msgstr "Erhalten Sie die neuesten Nachrichten in Echtzeit."
+
+msgid "Select language"
+msgstr "Sprache auswählen"
+
+msgid "Login - Enzyklopädie"
+msgstr "Anmeldung - Enzyklopädie"
+
+msgid "Login to"
+msgstr "Anmelden bei"
+
+msgid "Enzyklopädie"
+msgstr "Enzyklopädie"
+
+msgid "Username"
+msgstr "Benutzername"
+
+msgid "Password"
+msgstr "Passwort"
+
+msgid "Login"
+msgstr "Anmelden"
+
+msgid "Register"
+msgstr "Registrieren"
+
+msgid "Register - Mawsoa"
+msgstr "Registrieren - Mawsoa"
+
+msgid "Register at"
+msgstr "Registrieren bei"
+
+msgid "Mawsoa"
+msgstr "Mawsoa"
+
+msgid "Username"
+msgstr "Benutzername"
+
+msgid "Password"
+msgstr "Passwort"
+
+msgid "Register"
+msgstr "Registrieren"
+
+msgid "Back to Login"
+msgstr "Zurück zur Anmeldung"
+
+msgid "Weather"
+msgstr "Wetter"
+
+msgid "Enzyklopädie 🌐"
+msgstr "Enzyklopädie 🌐"
+
+msgid "Back to Dashboard"
+msgstr "Zurück zum Dashboard"
+
+msgid "Humidity"
+msgstr "Luftfeuchtigkeit"
+
+msgid "Wind"
+msgstr "Wind"
+
+msgid "km/h"
+msgstr "km/h"
+
+msgid "Enter city name"
+msgstr "Stadtname eingeben"
+
+msgid "Show Weather"
+msgstr "Wetter anzeigen"
+
+msgid "City not found"
+msgstr "Stadt nicht gefunden"
+
+msgid "An error occurred, please try again"
+msgstr "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
+
+msgid "Updating..."
+msgstr "Aktualisiere..."
+
+msgid "Update Data"
+msgstr "Daten aktualisieren"
+
+msgid "Chart of {from_currency} to {to_currency} over 7 days"
+msgstr "Diagramm von {from_currency} zu {to_currency} über 7 Tage"
+
+msgid "Previous 6 days"
+msgstr "Vorherige 6 Tage"
+
+msgid "Previous 5 days"
+msgstr "Vorherige 5 Tage"
+
+msgid "Previous 4 days"
+msgstr "Vorherige 4 Tage"
+
+msgid "Previous 3 days"
+msgstr "Vorherige 3 Tage"
+
+msgid "Previous 2 days"
+msgstr "Vorherige 2 Tage"
+
+msgid "Yesterday"
+msgstr "Gestern"
+
+msgid "Today"
+msgstr "Heute"
+
+msgid "{from_currency} to {to_currency} price"
+msgstr "Preis von {from_currency} zu {to_currency}"
+
+msgid "Error fetching data. Please try again later."
+msgstr "Fehler beim Abrufen der Daten. Bitte versuchen Sie es später erneut."

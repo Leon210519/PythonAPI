@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="{{ get_locale() }}">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ _("Register - Enzyklopädie") }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #56ccf2, #2f80ed);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="card p-4" style="width: 100%; max-width: 400px;">
+        <h3 class="text-center mb-4">📝 {{ _("Register at") }} <strong>{{ _("Mawsoa") }}</strong></h3>
+        {% if error %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% endif %}
+        <form method="POST">
+            <div class="mb-3">
+                <label class="form-label">{{ _("Username") }}</label>
+                <input type="text" name="username" class="form-control" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">{{ _("Password") }}</label>
+                <input type="password" name="password" class="form-control" required />
+            </div>
+            <div class="d-grid gap-2">
+                <button class="btn btn-success">{{ _("Register") }}</button>
+                <a href="{{ url_for('login') }}" class="btn btn-outline-secondary">{{ _("Back to Login") }}</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
